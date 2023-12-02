@@ -1,9 +1,9 @@
-import { readFile } from "fs";
+import { readFileSync } from "fs";
 
-readFile("src/Day01/input.txt", "utf8", (err, data) => {
-    if (err) throw err;
+function main() {
+    const data = readFileSync("src/Day01/input.txt", "utf8");
     console.log(day01(data));
-});
+}
 
 export function day01(data: string) {
 
@@ -32,6 +32,7 @@ export function day01(data: string) {
     })
 
     const sum = numbers.reduce((acc, val) => acc + val, 0);
-
     return sum;
 }
+
+main();

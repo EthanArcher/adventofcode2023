@@ -43,6 +43,9 @@ node_modules
 # Compiled JS files
 *.js
 
+# input files
+**/input.txt
+
 typings/
 lib/*.js
 test/*.js
