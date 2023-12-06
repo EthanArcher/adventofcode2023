@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import {separatedStringToNumberArray} from "../utils";
 
 function main() {
     const data = readFileSync("src/Day04/input.txt", "utf8");
@@ -13,8 +14,8 @@ function main() {
     cards.forEach(line => {
         let l = line.split(/[:|]/)
         let cardNumber = Number(l[0].split(/\s+/)[1]);
-        let winners = (l[1].trim().split(/\s+/).map(Number));
-        let youHave = (l[2].trim().split(/\s+/).map(Number));
+        let winners = separatedStringToNumberArray(l[1]);
+        let youHave = separatedStringToNumberArray(l[2]);
         let matches = 0;
         let points = 0;
         let numberOfCards = cardCounter.get(cardNumber) || 0;
