@@ -1,4 +1,4 @@
-import {findWaysToWin} from "../Day05/day05";
+import {findWaysToWin} from "./day06";
 
 describe("findWaysToWin", () => {
     it("should return correct value for number of ways to win", () => {

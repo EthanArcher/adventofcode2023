@@ -1,64 +1,38 @@
 import { readFileSync } from "fs";
-
-type Color = "red" | "green" | "blue"
+import {separatedStringToNumberArray} from "../utils";
 
 function main() {
-    const data = readFileSync("src/Day02/input.txt", "utf8");
-    const games = data.trim().split("\n");
-    const validGames = games.map(isValidGame);
+    const data = readFileSync("src/Day06/input.txt", "utf8");
+    const lines = data.split("\n");
+    const input: number[][] = [];
+    let bigT = Number(lines[0].split(/:/)[1].replace(/\s/g, ''));
+    let bigD = Number(lines[1].split(/:/)[1].replace(/\s/g, ''));
+    lines.forEach(l => {
+        let n: number[] = separatedStringToNumberArray(l.split(/:/)[1])
+        input.push(n);
+    })
 
-    let totalValidGames = 0;
-    for (let i= 0; i < games.length; i++) {
-        if (validGames[i]) {
-            totalValidGames = totalValidGames + (i + 1);
-        }
+    let margin = 1
+    for (let i=0; i<input[0].length; i++) {
+        let t = input[0][i];
+        let d = input[1][i];
+        margin = margin * findWaysToWin(t, d);
     }
 
-    const totalPowerOfGames = games.reduce((acc, game) => acc + powerOfGame(game), 0);
-    console.log(totalValidGames);
-    console.log(totalPowerOfGames);
+    console.log(margin)
+    console.log(findWaysToWin(bigT, bigD))
+
 }
 
-export function powerOfGame(game: string) {
-    const colorMap = new Map<Color, number>([
-        ["blue", 1],
-        ["red", 1],
-        ["green", 1]
-    ]);
-    const hands = game.split(/[;:,]/).slice(1);
-    hands.map(getColourAndValue).forEach(([color, value]) => {
-        const currentMax = colorMap.get(color) ?? 1;
-        if (value > currentMax) {
-            colorMap.set(color, value);
+export const findWaysToWin = (time:number, record:number): number => {
+    let count = 0;
+    for (let i=0; i<time; i++) {
+        let d = i * (time - i);
+        if (d > record) {
+            count++
         }
-    });
-    return Array.from(colorMap.values()).reduce((acc, val) => acc * val, 1);
+    }
+    return count;
 }
 
-function getColourAndValue(hand: string): [Color, number] {
-    const regex = /\d+/;
-    const color = ["red", "green", "blue"].find((c) => hand.includes(c)) as Color;
-    const number = Number(hand.match(regex)?.[0] ?? 0);
-    return [color, number];
-}
-
-export function isValidGame(game: string) {
-    const rounds = game.split(/[;:]/).slice(1);
-    const validRounds = rounds.map(isValidRound);
-    return validRounds.every((isValid) => isValid);
-}
-
-export function isValidRound(round: string) {
-    const maxValues: Record<Color, number> = {
-        red: 12,
-        green: 13,
-        blue: 14
-    };
-    const validHands = round.split(",").map((value) => {
-        const [color, number] = getColourAndValue(value);
-        return number <= maxValues[color];
-    });
-    return validHands.every((isValid) => isValid);
-}
-
-main();
+main()
