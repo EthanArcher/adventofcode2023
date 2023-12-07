@@ -7,9 +7,9 @@ describe("calculateHand", () => {
         expect("Four of a kind").toEqual(calculateHand("KQKKK"))
         expect("Full house",).toEqual(calculateHand("KKKQQ"))
         expect("Full house",).toEqual(calculateHand("KQKQK"))
-        expect("Three of a kind",).toEqual(calculateHand("KKKQJ"))
-        expect("Two pair").toEqual(calculateHand("KKQQJ"))
-        expect("One pair").toEqual(calculateHand("KKQJT"))
-        expect("High card").toEqual(calculateHand("KQJT9"))
+        expect("Three of a kind",).toEqual(calculateHand("KKKQT"))
+        expect("Two pair").toEqual(calculateHand("KKQQT"))
+        expect("One pair").toEqual(calculateHand("KKQAT"))
+        expect("High card").toEqual(calculateHand("KQAT9"))
     });
 });

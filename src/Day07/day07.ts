@@ -5,9 +5,11 @@ type Card = "A" | "K" | "Q" | "J" |
     "5" | "4" | "3" | "2" | "1"
 
 const sortedCards: Card[] = [
+    "J",
     "1", "2" , "3" , "4" , "5",
     "6", "7", "8", "9", "T",
-    "J", "Q", "K", "A"
+    //"J",
+    "Q", "K", "A"
 ]
 
 export type HandResult = "Five of a kind" | "Four of a kind" | "Full house" |
@@ -61,7 +63,6 @@ function main() {
     }
 
     console.log(total)
-
 }
 
 export const sortHands = (handsArray: handWithRankAndBid[]): handWithRankAndBid[] => {
@@ -81,7 +82,27 @@ export const sortHands = (handsArray: handWithRankAndBid[]): handWithRankAndBid[
 }
 
 export const calculateHand = (hand: string): HandResult =>   {
-    const uniqueCards = Array.from(new Set(hand.split("")));
+    let handSplit = hand.split("")
+    let charMap = new Map<string, number>;
+    handSplit.forEach(c => {
+        if (c != "J") addToMapOrIncrement(charMap, c);
+    })
+
+    // Find the character with the highest count
+    let maxChar: string = "J";
+    let maxCount: number = 0;
+
+    for (let [char, count] of charMap) {
+        if (count > maxCount) {
+            maxChar = char;
+            maxCount = count;
+        }
+    }
+
+    hand = hand.replace(new RegExp("J", "g"), maxChar)
+    handSplit = hand.split("")
+
+    const uniqueCards = Array.from(new Set(handSplit));
 
     if (uniqueCards.length === 1) {
         return "Five of a kind"
@@ -105,10 +126,16 @@ export const calculateHand = (hand: string): HandResult =>   {
     }
 
     return "High card"
+
 }
 
 const numberOfOccurrences = (hand:string, char:string): number => {
     return hand.split(char).length - 1;
+}
+
+function addToMapOrIncrement(map: Map<string, number>, card: string) {
+    const count = map.get(card) || 0;
+    map.set(card, count + 1);
 }
 
 main();
