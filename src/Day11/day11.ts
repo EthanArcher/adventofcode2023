@@ -13,13 +13,16 @@ function main() {
     // useful for smaller maps
     //printMap(map)
 
+    for (let r = 0; r < map.length; r++) {
+        let allEmptyRows = map[r].every(v => v == ".");
+        if (allEmptyRows) {
+            emptyRows.push(r);
+        }
+    }
+
     for (let c = 0; c < map.length; c++) {
         let allEmptyColumns = true;
         for (let r = 0; r < map.length; r++) {
-            let allEmptyRows = map[r].every(v => v == ".");
-            if (allEmptyRows) {
-                emptyRows.push(r);
-            }
             allEmptyColumns = allEmptyColumns && map[r][c] == "."
             if (map[r][c] == "#") {
                 locations.push([r,c])
