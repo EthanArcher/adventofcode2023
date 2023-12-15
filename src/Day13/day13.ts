@@ -1,16 +1,16 @@
 import { readFileSync } from "fs";
-import {} from "../utils";
+import {readFileToLines} from "../utils";
 
 interface lavaField {
     map:string[][]
 }
 
 function main() {
-    const data = readFileSync("src/Day13/input.txt", "utf8");
+    const lines = readFileToLines("src/Day13/input.txt")
     let map: string[][] = [];
     let fields: lavaField[] = []
     let lavaFieldIndex = 0;
-    data.split("\n").forEach(l => {
+    lines.forEach(l => {
         if (l == "") {
             fields.push({map})
             map = []
