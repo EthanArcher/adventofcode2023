@@ -2,6 +2,7 @@
   "name": "AdventOfCode23",
   "version": "1.0.0",
   "dependencies": {
+    "@datastructures-js/priority-queue": "^6.3.0",
     "fs": "^0.0.1-security"
   },
   "devDependencies": {
