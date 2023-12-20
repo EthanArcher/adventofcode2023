@@ -20,19 +20,19 @@ function main() {
 
     // part 1
 
-    let finished = false;
-    let mapIndex = 0;
-    let currentPosition = "AAA";
-    let steps = 0
-    while (!finished) {
-        steps++;
-        currentPosition = getNextNode(rightLeftArray, map, currentPosition, mapIndex)
-        if (currentPosition === "ZZZ") {
-            finished = true
-        }
-        mapIndex = (mapIndex + 1) % rightLeftArray.length
-    }
-    console.log("Part one: " + steps)
+    // let finished = false;
+    // let mapIndex = 0;
+    // let currentPosition = "AAA";
+    // let steps = 0
+    // while (!finished) {
+    //     steps++;
+    //     currentPosition = getNextNode(rightLeftArray, map, currentPosition, mapIndex)
+    //     if (currentPosition === "ZZZ") {
+    //         finished = true
+    //     }
+    //     mapIndex = (mapIndex + 1) % rightLeftArray.length
+    // }
+    // console.log("Part one: " + steps)
 
     // part 2
     let nodes = getAllStatingNodes(map);

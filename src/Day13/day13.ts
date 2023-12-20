@@ -6,11 +6,11 @@ interface lavaField {
 }
 
 function main() {
-    const lines = readFileToLines("src/Day13/input.txt")
+    const data = readFileSync("src/Day13/input.txt", "utf8");
     let map: string[][] = [];
     let fields: lavaField[] = []
     let lavaFieldIndex = 0;
-    lines.forEach(l => {
+    data.split("\n").forEach(l => {
         if (l == "") {
             fields.push({map})
             map = []
