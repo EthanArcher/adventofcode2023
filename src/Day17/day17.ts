@@ -40,7 +40,7 @@ function main() {
     // for (let i=0; i<100; i++) {
     while(nodesToVisit.size() > 0) {
         let node = nodesToVisit.dequeue();
-        console.log("visiting node: " + JSON.stringify(node))
+        console.log("visiting node: " + node.location[0] + "," + node.location[1] + " with heatloss of: " + node.heatLoss)
         if (node.location[0] == nodes.length-1 && node.location[1] == nodes[0].length-1) {
             console.log("*******")
             console.log(node.heatLoss)
@@ -48,45 +48,48 @@ function main() {
         }
 
         // check if we have been here already as the last time would have been the best time
-        if (visitedNodes.includes(JSON.stringify({location: node.location, currentDirection:node.currentDirection, currentSteps:node.currentSteps}))) {
+        if (visitedNodes.includes(String([node.location[0], node.location[1], node.currentDirection[0], node.currentDirection[1], node.currentSteps]))) {
             continue;
         }
 
-        visitedNodes.push(JSON.stringify({location: node.location, currentDirection:node.currentDirection, currentSteps:node.currentSteps}))
+        visitedNodes.push(String([node.location[0], node.location[1], node.currentDirection[0], node.currentDirection[1], node.currentSteps]))
         directionMap.forEach((direction, name) => {
 
-            let steps = 1
-            if (name == node.currentDirection) {
-                steps = node.currentSteps + 1
-            }
+            // move 4 to 7 spaces
+            for (let ultra = 4; ultra <=10; ultra++) {
 
-            if (node.location[0] + direction[0] >= 0 &&
-                node.location[0] + direction[0] < nodes.length &&
-                node.location[1] + direction[1] >= 0 &&
-                node.location[1] + direction[1] < nodes[0].length &&
-                !(directionMap.get(node.currentDirection)![0] + direction[0] == 0 && directionMap.get(node.currentDirection)![1] + direction[1] == 0) &&
-                steps <= 3) {
+                let steps = ultra
 
-                let row = node.location[0] + direction[0]
-                let column = node.location[1] + direction[1]
-                let newLocation = [row, column]
-                let heatLoss = node.heatLoss + nodes[row][column]
-
-                // if the new node hasnt been visited, add it to the list
-                if (!visitedNodes.includes(JSON.stringify({location: newLocation, currentDirection:direction, currentSteps:steps}))) {
-                    // console.log("Queueing up: " + JSON.stringify({location: newLocation, heatLoss: heatLoss, currentDirection:name, currentSteps: steps}))
-                    nodesToVisit.enqueue({location: newLocation, heatLoss: heatLoss, currentDirection:name, currentSteps: steps})
+                if (name == node.currentDirection) {
+                    steps = node.currentSteps + ultra
                 }
 
-                // check if the new heatloss is less than the current heat loss
-                if (lowestHeatLossMap.has(String(newLocation))) {
-                    heatLoss = Math.min(heatLoss, lowestHeatLossMap.get(String(newLocation))!.totalHeatLoss)
+                if (node.location[0] + (direction[0] * ultra) >= 0 &&
+                    node.location[0] + (direction[0] * ultra) < nodes.length &&
+                    node.location[1] + (direction[1] * ultra) >= 0 &&
+                    node.location[1] + (direction[1] * ultra) < nodes[0].length &&
+                    !(directionMap.get(node.currentDirection)![0] + direction[0] == 0 && directionMap.get(node.currentDirection)![1] + direction[1] == 0) &&
+                    steps <= 10) {
+
+                    let row = node.location[0] + (direction[0] * ultra)
+                    let column = node.location[1] + (direction[1] * ultra)
+                    let newLocation = [row, column]
+
+                    // heat loss along the way
+                    let heatLoss = node.heatLoss
+                    for (let hl = 1; hl <= ultra; hl++) {
+                        heatLoss += nodes[node.location[0] + (direction[0] * hl)][node.location[1] + (direction[1] * hl)]
+                    }
+
+                    nodesToVisit.enqueue({
+                        location: newLocation,
+                        heatLoss: heatLoss,
+                        currentDirection: name,
+                        currentSteps: steps
+                    })
+
+
                 }
-                lowestHeatLossMap.set(String(newLocation), {
-                    totalHeatLoss: heatLoss,
-                    currentDirection: name,
-                    currentSteps: steps
-                })
             }
         })
     }

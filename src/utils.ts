@@ -12,9 +12,6 @@ export function readFileToLines(filename: string): string[] {
     return data.trim().split("\n");
 }
 
-const data = readFileSync("src/Day02/input.txt", "utf8");
-const games = data.trim().split("\n");
-
 export function sumNumberArray(...nums: number[] | (readonly number[])[]): number {
     let tot = 0;
     for (const x of nums) {
