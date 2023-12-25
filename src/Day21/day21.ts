@@ -27,7 +27,7 @@ function main() {
 
     // run this section to create a 5x5 grid
     // this will give us all the possible map combinations
-    let required = 327
+    let required = (maxRow / 2) + ((maxRow + 1) * 2)
     for (let steps = 0; steps<required; steps++) {
         console.log(steps)
         const currentMapToPositions: Map<string, Set<string>> = new Map<string, Set<string>>()
