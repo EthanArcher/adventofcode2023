@@ -1,10 +1,4 @@
 import {printMap, readFileToLines} from "../utils";
-import {MaxPriorityQueue} from '@datastructures-js/priority-queue';
-
-interface positionAndVisited {
-    position: string,
-    visited: string[]
-}
 
 const directionMap = new Map<string, number[]>();
 directionMap.set("U", [-1,0]);
@@ -16,8 +10,9 @@ let maxRow = 0;
 let maxCol = 0;
 let finalPosition: number[] = []
 let startingPosition: number[] = []
-let pathLengths: number[] = []
+let maxPathLength:number = 0
 let map:string[][] = []
+let graph:Map<string, Map<string, number>> = new Map<string, Map<string, number>>()
 
 function main() {
     const lines = readFileToLines("src/Day23/input.txt")
@@ -30,68 +25,109 @@ function main() {
     startingPosition = [0, lines[0].indexOf(".")]
     finalPosition = [maxRow, lines[maxRow].indexOf(".")]
 
-    printMap(map)
-    console.log(startingPosition)
-    
-    let pathsToTransverse:positionAndVisited[] = []
-    pathsToTransverse.push({position: String(startingPosition), visited:[]})
+    // want to build a weighted graph to reduce the searching
+    graph.set(String(startingPosition), new Map<string, number>())
 
-    while (pathsToTransverse.length > 0) {
-        let newPaths: positionAndVisited[] = []
-        pathsToTransverse.forEach(pav => {
-            newPaths = newPaths.concat(move(pav.position.split(",").map(Number), pav.visited))
-        })
-        pathsToTransverse = [...newPaths]
-        console.log(pathsToTransverse.length)
-        // pathsToTransverse = filterPaths(pathsToTransverse)
+    // add all the nodes without connections
+    for (let r=0; r<maxRow; r++) {
+        for (let c = 0; c < maxCol; c++) {
+            if (isNode([r,c])) {
+                graph.set(String([r,c]), new Map<string, number>())
+            }
+        }
     }
 
-    console.log(pathLengths)
-    console.log(Math.max(...pathLengths))
+    // add the final node
+    graph.set(String(finalPosition), new Map<string, number>())
 
-}
-
-function filterPaths(paths: positionAndVisited[]) {
-    let c_paths = [...paths]
-    paths.forEach((pav) => {
-        let currentPosition = pav.position
-        c_paths = c_paths.filter(p => !p.visited.includes(currentPosition))
+    let snowShoesOn = false
+    // for each of the nodes in the graph find its connections
+    graph.forEach((connections, pos) => {
+        getConnectedNodesWithWeights(pos, snowShoesOn)
     })
-    return c_paths
+
+    dfs(startingPosition, new Set(), 0)
+    console.log("Part 1: " + maxPathLength)
+
+    // Part 2
+    snowShoesOn = true
+    // for each of the nodes in the graph find its connections
+    graph.forEach((connections, pos) => {
+        getConnectedNodesWithWeights(pos, snowShoesOn)
+    })
+
+    dfs(startingPosition, new Set(), 0)
+    console.log("Part 2: " + maxPathLength)
+
 }
 
-function move(position: number[], visited:string[]): positionAndVisited[] {
-
-    let n_pavs:positionAndVisited[] = []
+function dfs(position: number[], vis: Set<string>, currentWeight: number) {
+    let visited = new Set(vis)
+    visited.add(String(position))
 
     if (position[0] == finalPosition[0] && position[1] == finalPosition[1]) {
-        pathLengths.push(visited.length)
-        return []
+        maxPathLength = Math.max(maxPathLength, currentWeight)
+    } else {
+        let connections: Map<string, number> = graph.get(String(position))!
+        connections.forEach((weight, con) => {
+            if (!visited.has(con)) {
+                dfs(con.split(",").map(Number), visited, currentWeight + weight)
+            }
+        })
     }
+}
 
+function getConnectedNodesWithWeights(position: string, hasSnowShoesOn: boolean) {
+    let visited: string[] = []
     visited.push(String(position))
+    transverse(position.split(",").map(Number), visited, position, hasSnowShoesOn)
+}
+
+function transverse(position:number[], vis:string[], startingPosition: string, hasSnowShoesOn: boolean) {
+
     let [cx, cy] = position
     directionMap.forEach((dir, name) => {
         let [x,y] = dir
         let nx = cx + x;
         let ny = cy + y;
 
+        let visited = [...vis]
+
         if ((nx >= 0) && (nx <= maxRow) && (ny >= 0) && (ny <= maxCol) &&
             (!visited.includes(String([nx, ny]))) &&
             map[nx][ny] != "#" &&
-            (map[nx][ny] == "." || canGoDownSlope(name, map[nx][ny]))
+            canGoDownSlope(name, map[nx][ny], hasSnowShoesOn)
         ) {
-            n_pavs.push({position: String([nx, ny]), visited: [...visited]})
+            if (graph.has(String([nx,ny]))) {
+                let connections = graph.get(startingPosition)!
+                connections.set(String([nx,ny]), visited.length)
+                graph.set(String(startingPosition), connections)
+            } else {
+                visited.push(String([nx, ny]))
+                transverse([nx,ny], [...visited], startingPosition, hasSnowShoesOn)
+            }
         }
     })
-    
-    return n_pavs
-
 }
 
-function canGoDownSlope(direction: string, slope: string): boolean {
+function isNode(position: number[]) {
+    let [r,c] = position
+    let connection = 0;
+    directionMap.forEach((dir, name) => {
+        let [x, y] = dir
+        let nx = r + x;
+        let ny = c + y;
 
-    // return true
+        if ((nx >= 0) && (nx <= maxRow) && (ny >= 0) && (ny <= maxCol) && map[nx][ny] != "#" && map[r][c] != "#") {
+            connection++
+        }
+    })
+    return connection > 2
+}
+
+function canGoDownSlope(direction: string, slope: string, hasSnowShoesOn: boolean): boolean {
+
+    if (hasSnowShoesOn) return true;
 
     if (slope == ".") {
         return true
